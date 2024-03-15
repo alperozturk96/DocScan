@@ -40,7 +40,6 @@ fun ScannerScreen(activity: ComponentActivity) {
         Spacer(modifier = Modifier.weight(1f))
 
         FilledTonalButton(onClick = {
-
             startScan = true
         }, modifier = Modifier
             .fillMaxWidth(0.8f)
