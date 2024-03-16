@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">DocScan</string>
 
+    <string name="scanner_screen_empty_text">No document scanned</string>
     <string name="scanner_screen_scan_button_text">Tap to Scan</string>
 
     <string name="storage_save_image_to_gallery_success_message">Document saved</string>

@@ -5,17 +5,23 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,8 +36,9 @@ import com.coolnexttech.docscan.util.Storage
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 
 @Composable
-fun ScannerScreen(activity: ComponentActivity) {
+fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
     val context = LocalContext.current
+    val docs by viewModel.docs.collectAsState()
     var startScan by remember {
         mutableStateOf(false)
     }
@@ -47,7 +54,7 @@ fun ScannerScreen(activity: ComponentActivity) {
                     for (page in pages) {
                         val imageUri = page.imageUri
 
-                        Storage.saveToGallery(context, imageUri)
+                        Storage.saveDoc(context, imageUri)
                     }
                 }
             }
@@ -61,6 +68,24 @@ fun ScannerScreen(activity: ComponentActivity) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        if (docs != null) {
+            LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+                items(docs!!) {
+                    Image(
+                        bitmap = it,
+                        contentDescription = null,
+                        modifier = Modifier.aspectRatio(1f)
+                    )
+                }
+            }
+        } else {
+            Text(
+                text = stringResource(id = R.string.scanner_screen_empty_text),
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
+
+
         Spacer(modifier = Modifier.weight(1f))
 
         FilledTonalButton(
