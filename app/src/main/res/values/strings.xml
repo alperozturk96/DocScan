@@ -3,4 +3,7 @@
 
     <string name="scanner_screen_scan_button_text">Tap to Scan</string>
 
+    <string name="storage_save_image_to_gallery_success_message">Document saved</string>
+    <string name="storage_save_image_to_gallery_error_message">Unexpected error occurred during saving document to gallery</string>
+
 </resources>

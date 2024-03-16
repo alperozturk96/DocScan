@@ -22,13 +22,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.docscan.R
+import com.coolnexttech.docscan.util.Storage
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 
 @Composable
 fun ScannerScreen(activity: ComponentActivity) {
+    val context = LocalContext.current
     var startScan by remember {
         mutableStateOf(false)
     }
@@ -40,8 +43,12 @@ fun ScannerScreen(activity: ComponentActivity) {
             if (it.resultCode == Activity.RESULT_OK) {
                 val result = GmsDocumentScanningResult.fromActivityResultIntent(it.data)
 
-                result?.pdf?.let { pdf ->
-                    // TODO Save
+                result?.pages?.let { pages ->
+                    for (page in pages) {
+                        val imageUri = page.imageUri
+
+                        Storage.saveToGallery(context, imageUri)
+                    }
                 }
             }
         }

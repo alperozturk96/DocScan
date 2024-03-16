@@ -4,6 +4,7 @@ import android.content.IntentSender
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions.RESULT_FORMAT_JPEG
 import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions.RESULT_FORMAT_PDF
 import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions.SCANNER_MODE_FULL
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
@@ -15,9 +16,9 @@ fun Scan(
     start: (IntentSender) -> Unit
 ) {
     val options = GmsDocumentScannerOptions.Builder()
-        .setGalleryImportAllowed(false)
+        .setGalleryImportAllowed(true)
         .setPageLimit(1)
-        .setResultFormats(RESULT_FORMAT_PDF)
+        .setResultFormats(RESULT_FORMAT_JPEG, RESULT_FORMAT_PDF)
         .setScannerMode(SCANNER_MODE_FULL)
         .build()
 

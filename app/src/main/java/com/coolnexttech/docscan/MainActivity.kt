@@ -6,14 +6,27 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.coolnexttech.docscan.ui.scanner.ScannerScreen
 import com.coolnexttech.docscan.ui.theme.DocScanTheme
+import com.coolnexttech.docscan.util.PermissionManager
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var permissionManager: PermissionManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        permissionManager = PermissionManager(this)
+
         setContent {
+
+            LaunchedEffect(Unit) {
+                permissionManager.requestForStoragePermissions()
+            }
+
             DocScanTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
