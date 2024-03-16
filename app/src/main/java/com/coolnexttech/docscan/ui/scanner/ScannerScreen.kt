@@ -1,11 +1,14 @@
 package com.coolnexttech.docscan.ui.scanner
 
 import android.app.Activity
+import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,12 +32,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import com.coolnexttech.docscan.R
 import com.coolnexttech.docscan.util.Storage
+import com.coolnexttech.docscan.util.extensions.toImageBitmap
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
+
 
 @Composable
 fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
@@ -55,6 +65,7 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
                         val imageUri = page.imageUri
 
                         Storage.saveDoc(context, imageUri)
+                        viewModel.fetchDocs()
                     }
                 }
             }
@@ -69,12 +80,23 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
         verticalArrangement = Arrangement.Center
     ) {
         if (docs != null) {
-            LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+            ) {
                 items(docs!!) {
                     Image(
-                        bitmap = it,
+                        bitmap = it.toImageBitmap(context),
                         contentDescription = null,
-                        modifier = Modifier.aspectRatio(1f)
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier
+                            .clickable {
+                                val intent = Intent(Intent.ACTION_VIEW, it)
+                                startActivity(context, intent, null)
+                            }
+                            .padding(4.dp)
+                            .aspectRatio(1f)
+                            .clip(RoundedCornerShape(16.dp))
+                            .border(0.dp, Color.Transparent, RoundedCornerShape(16.dp)),
                     )
                 }
             }
@@ -100,8 +122,6 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
                 style = MaterialTheme.typography.titleLarge
             )
         }
-
-        Spacer(modifier = Modifier.weight(1f))
     }
 
     if (startScan) {
