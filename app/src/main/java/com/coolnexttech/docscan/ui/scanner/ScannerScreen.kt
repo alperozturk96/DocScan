@@ -3,14 +3,15 @@ package com.coolnexttech.docscan.ui.scanner
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -49,8 +51,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import com.coolnexttech.docscan.R
 import com.coolnexttech.docscan.util.Storage
-import com.coolnexttech.docscan.util.extensions.getFileName
-import com.coolnexttech.docscan.util.extensions.toImageBitmap
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 
 
@@ -85,8 +85,7 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
     )
 
     Scaffold(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp),
+        .fillMaxSize(),
         topBar = {
             if (!docs.isNullOrEmpty()) {
                 SearchBar(
@@ -100,23 +99,35 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
             }
         },
         bottomBar = {
-            FilledTonalButton(
-                onClick = {
-                    startScan = true
-                }, modifier = Modifier
+            Box(
+                modifier = Modifier
                     .fillMaxWidth()
                     .height(70.dp)
+                    .background(
+                        color = Color.Black.copy(alpha = 0.5f),
+                    )
             ) {
-                Text(
-                    text = stringResource(id = (R.string.scanner_screen_scan_button_text)),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = Color.White
-                )
+                FilledTonalButton(
+                    onClick = {
+                        startScan = true
+                    }, modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(50.dp)
+                        .align(Alignment.Center)
+                ) {
+                    Text(
+                        text = stringResource(id = (R.string.scanner_screen_scan_button_text)),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color.White
+                    )
+                }
             }
+
         }) { padding ->
         if (!docs.isNullOrEmpty()) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
+                modifier = Modifier.padding(16.dp),
                 contentPadding = padding,
             ) {
                 items(docs!!) { doc ->
@@ -140,10 +151,10 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
 }
 
 @Composable
-private fun DocBox(doc: Uri, context: Context) {
+private fun DocBox(doc: Doc, context: Context) {
     Column {
         Image(
-            bitmap = doc.toImageBitmap(context),
+            bitmap = doc.imageBitmap,
             contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier = Modifier
@@ -152,13 +163,13 @@ private fun DocBox(doc: Uri, context: Context) {
                 .clip(RoundedCornerShape(16.dp))
                 .border(0.dp, Color.Transparent, RoundedCornerShape(16.dp))
                 .clickable {
-                    val intent = Intent(Intent.ACTION_VIEW, doc)
+                    val intent = Intent(Intent.ACTION_VIEW, doc.uri)
                     startActivity(context, intent, null)
                 },
         )
 
         Text(
-            text = context.getFileName(doc) ?: "",
+            text = doc.filename,
             textAlign = TextAlign.Center,
             modifier = Modifier
         )
@@ -179,7 +190,8 @@ private fun SearchBar(
             onValueChange(it)
         },
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(16.dp),
         trailingIcon = {
             if (text.isNotEmpty()) {
                 IconButton(
