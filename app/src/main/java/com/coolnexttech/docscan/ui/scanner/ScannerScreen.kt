@@ -50,8 +50,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.docscan.R
 import com.coolnexttech.docscan.ui.component.MoreActionsBottomSheet
+import com.coolnexttech.docscan.ui.component.SimpleAlertDialog
 import com.coolnexttech.docscan.util.Storage
 import com.coolnexttech.docscan.util.extensions.openUri
+import com.coolnexttech.docscan.util.extensions.renameUri
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 
 
@@ -63,9 +65,6 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
         mutableStateOf("")
     }
     var startScan by remember {
-        mutableStateOf(false)
-    }
-    var showRenameAlertDialog by remember {
         mutableStateOf(false)
     }
 
@@ -137,7 +136,7 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
                 contentPadding = padding,
             ) {
                 items(filteredDocs!!) { doc ->
-                    DocBox(doc, context, showRenameAlertDialog = { showRenameAlertDialog = true })
+                    DocBox(doc, context, viewModel)
                 }
             }
         } else {
@@ -158,8 +157,10 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun DocBox(doc: Doc, context: Context, showRenameAlertDialog: () -> Unit) {
+private fun DocBox(doc: Doc, context: Context, viewModel: ScannerViewModel) {
     var showBottomSheet by remember { mutableStateOf(false) }
+    var showRenameAlertDialog by remember { mutableStateOf(false) }
+    var docName by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -186,6 +187,30 @@ private fun DocBox(doc: Doc, context: Context, showRenameAlertDialog: () -> Unit
         )
     }
 
+    if (showRenameAlertDialog) {
+        SimpleAlertDialog(
+            titleId = R.string.scanner_screen_rename_alert_dialog_title,
+            description = null,
+            content = {
+                TextField(
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    value = docName,
+                    onValueChange = {
+                        docName = it
+                    },
+                    singleLine = true
+                )
+            },
+            onComplete = {
+                context.renameUri(doc.uri, docName)
+                viewModel.fetchDocs()
+            },
+            dismiss = {
+                showRenameAlertDialog = false
+            }
+        )
+    }
+
     if (showBottomSheet) {
         val bottomSheetAction = listOf(
             Triple(
@@ -198,7 +223,7 @@ private fun DocBox(doc: Doc, context: Context, showRenameAlertDialog: () -> Unit
                 R.drawable.ic_rename,
                 R.string.scanner_screen_more_action_bottom_sheet_rename
             ) {
-                showRenameAlertDialog()
+                showRenameAlertDialog = true
             }
         )
 

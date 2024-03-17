@@ -62,5 +62,4 @@ class ScannerViewModel: ViewModel() {
             }
         }
     }
-
 }

@@ -1,12 +1,16 @@
 package com.coolnexttech.docscan.util.extensions
 
 import android.content.ContentResolver
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.widget.Toast
 import java.io.File
+
 
 fun Context.showToast(textId: Int) {
     Toast.makeText(
@@ -31,4 +35,13 @@ private fun Context.getContentFileName(uri: Uri): String? = runCatching {
 fun Context.openUri(uri: Uri) {
     val intent = Intent(Intent.ACTION_VIEW, uri)
     startActivity(intent)
+}
+
+fun Context.renameUri(uri: Uri, filename: String) {
+    val contentValues = ContentValues()
+    contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        this.contentResolver.update(uri, contentValues, null)
+    }
 }
