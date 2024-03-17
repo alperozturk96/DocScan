@@ -2,15 +2,15 @@ package com.coolnexttech.docscan.ui.scanner
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -48,9 +48,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
 import com.coolnexttech.docscan.R
+import com.coolnexttech.docscan.ui.component.MoreActionsBottomSheet
 import com.coolnexttech.docscan.util.Storage
+import com.coolnexttech.docscan.util.extensions.openUri
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 
 
@@ -62,6 +63,9 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
         mutableStateOf("")
     }
     var startScan by remember {
+        mutableStateOf(false)
+    }
+    var showRenameAlertDialog by remember {
         mutableStateOf(false)
     }
 
@@ -133,7 +137,7 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
                 contentPadding = padding,
             ) {
                 items(filteredDocs!!) { doc ->
-                    DocBox(doc, context)
+                    DocBox(doc, context, showRenameAlertDialog = { showRenameAlertDialog = true })
                 }
             }
         } else {
@@ -152,9 +156,20 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun DocBox(doc: Doc, context: Context) {
-    Column {
+private fun DocBox(doc: Doc, context: Context, showRenameAlertDialog: () -> Unit) {
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .clip(RoundedCornerShape(16.dp))
+            .border(0.dp, Color.Transparent, RoundedCornerShape(16.dp))
+            .combinedClickable(
+                onClick = { context.openUri(doc.uri) },
+                onLongClick = { showBottomSheet = true }
+            )
+    ) {
         Image(
             bitmap = doc.imageBitmap,
             contentDescription = null,
@@ -162,18 +177,35 @@ private fun DocBox(doc: Doc, context: Context) {
             modifier = Modifier
                 .padding(4.dp)
                 .aspectRatio(1f)
-                .clip(RoundedCornerShape(16.dp))
-                .border(0.dp, Color.Transparent, RoundedCornerShape(16.dp))
-                .clickable {
-                    val intent = Intent(Intent.ACTION_VIEW, doc.uri)
-                    startActivity(context, intent, null)
-                },
         )
 
         Text(
             text = doc.filename,
             textAlign = TextAlign.Center,
             modifier = Modifier
+        )
+    }
+
+    if (showBottomSheet) {
+        val bottomSheetAction = listOf(
+            Triple(
+                R.drawable.ic_open,
+                R.string.scanner_screen_more_action_bottom_sheet_open
+            ) {
+                context.openUri(doc.uri)
+            },
+            Triple(
+                R.drawable.ic_rename,
+                R.string.scanner_screen_more_action_bottom_sheet_rename
+            ) {
+                showRenameAlertDialog()
+            }
+        )
+
+        MoreActionsBottomSheet(
+            title = doc.filename,
+            actions = bottomSheetAction,
+            dismiss = { showBottomSheet = false }
         )
     }
 }

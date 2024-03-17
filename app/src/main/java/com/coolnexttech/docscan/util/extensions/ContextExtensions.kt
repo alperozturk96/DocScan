@@ -2,6 +2,7 @@ package com.coolnexttech.docscan.util.extensions
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.widget.Toast
@@ -26,3 +27,8 @@ private fun Context.getContentFileName(uri: Uri): String? = runCatching {
         return@use cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME).let(cursor::getString)
     }
 }.getOrNull()
+
+fun Context.openUri(uri: Uri) {
+    val intent = Intent(Intent.ACTION_VIEW, uri)
+    startActivity(intent)
+}
