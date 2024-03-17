@@ -32,7 +32,7 @@ object Storage {
         val outputStream: OutputStream = context.contentResolver.openOutputStream(uri) ?: return
 
         try {
-            val bitmap = imageUri.toBitmap(context) ?: return
+            val bitmap = imageUri.toBitmap(context)
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             outputStream.flush()
             context.showToast(R.string.storage_save_image_to_gallery_success_message)

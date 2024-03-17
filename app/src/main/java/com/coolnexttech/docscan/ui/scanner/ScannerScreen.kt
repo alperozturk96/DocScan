@@ -152,6 +152,9 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
 
     if (startScan) {
         Scan(activity, start = {
+
+            // TODO always launching even with scroll
+            // TODO after edit not showing edited docs
             scannerLauncher.launch(IntentSenderRequest.Builder(it).build())
         })
     }
