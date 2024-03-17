@@ -57,7 +57,7 @@ import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 @Composable
 fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
     val context = LocalContext.current
-    val docs by viewModel.docs.collectAsState()
+    val filteredDocs by viewModel.filteredDocs.collectAsState()
     var searchText by remember {
         mutableStateOf("")
     }
@@ -87,13 +87,15 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
     Scaffold(modifier = Modifier
         .fillMaxSize(),
         topBar = {
-            if (!docs.isNullOrEmpty()) {
+            if (!filteredDocs.isNullOrEmpty()) {
                 SearchBar(
                     text = searchText,
                     onValueChange = {
                         searchText = it
+                        viewModel.search(it)
                     }, clear = {
                         searchText = ""
+                        viewModel.search(searchText)
                     }
                 )
             }
@@ -124,13 +126,13 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
             }
 
         }) { padding ->
-        if (!docs.isNullOrEmpty()) {
+        if (!filteredDocs.isNullOrEmpty()) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
                 modifier = Modifier.padding(16.dp),
                 contentPadding = padding,
             ) {
-                items(docs!!) { doc ->
+                items(filteredDocs!!) { doc ->
                     DocBox(doc, context)
                 }
             }

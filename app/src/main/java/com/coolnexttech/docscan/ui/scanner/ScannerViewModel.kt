@@ -11,11 +11,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ScannerViewModel: ViewModel() {
 
-    private val _docs: MutableStateFlow<List<Doc>?> = MutableStateFlow(null)
-    val docs: StateFlow<List<Doc>?> = _docs
+    private val _docs: ArrayList<Doc> = arrayListOf()
+
+    private val _filteredDocs: MutableStateFlow<List<Doc>?> = MutableStateFlow(null)
+    val filteredDocs: StateFlow<List<Doc>?> = _filteredDocs
 
     init {
         fetchDocs()
@@ -23,7 +26,6 @@ class ScannerViewModel: ViewModel() {
 
     fun fetchDocs() {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = arrayListOf<Doc>()
             val docUris = Storage.readDocs()
 
             docUris.forEach { uri ->
@@ -32,11 +34,30 @@ class ScannerViewModel: ViewModel() {
                 context?.let {
                     val fileName = context.getFileName(uri) ?: ""
                     val imageBitmap = uri.toImageBitmap(context)
-                    result.add(Doc(fileName, imageBitmap, uri))
+                    _docs.add(Doc(fileName, imageBitmap, uri))
                 }
             }
 
-            _docs.update {
+            _filteredDocs.update {
+                _docs
+            }
+        }
+    }
+
+    fun search(text: String) {
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                if (text.isEmpty()) {
+                    _docs
+                } else {
+                    val lowerCaseQuery = text.lowercase()
+                    _docs.filter { doc ->
+                        doc.filename.lowercase().contains(lowerCaseQuery)
+                    }
+                }
+            }
+
+            _filteredDocs.update {
                 result
             }
         }
