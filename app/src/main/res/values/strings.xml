@@ -11,6 +11,8 @@
     <string name="scanner_screen_more_action_bottom_sheet_edit">Edit</string>
     <string name="scanner_screen_more_action_bottom_sheet_rename">Rename</string>
 
+    <string name="scanner_build_error_text">Oops! Something went wrong. We couldnt complete your request because the required Google Play services are not available on this device. Please make sure your device is connected to the internet and try again.</string>
+
     <string name="storage_save_image_to_gallery_success_message">Document saved</string>
     <string name="storage_save_image_to_gallery_error_message">Unexpected error occurred during saving document to gallery</string>
 

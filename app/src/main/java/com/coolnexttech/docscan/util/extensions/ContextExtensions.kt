@@ -42,6 +42,8 @@ fun Context.renameUri(uri: Uri, filename: String) {
     contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        this.contentResolver.update(uri, contentValues, null)
+        contentResolver.update(uri, contentValues, null)
+    } else {
+        contentResolver.update(uri, contentValues, null, null)
     }
 }
