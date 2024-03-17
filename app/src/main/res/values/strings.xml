@@ -6,9 +6,9 @@
     <string name="scanner_screen_empty_text">No document scanned</string>
     <string name="scanner_screen_scan_button_text">Tap to Scan</string>
 
-    <string name="scanner_screen_rename_alert_dialog_title">Rename Doc</string>
+    <string name="scanner_screen_rename_alert_dialog_title">Rename</string>
 
-    <string name="scanner_screen_more_action_bottom_sheet_open">Open</string>
+    <string name="scanner_screen_more_action_bottom_sheet_edit">Edit</string>
     <string name="scanner_screen_more_action_bottom_sheet_rename">Rename</string>
 
     <string name="storage_save_image_to_gallery_success_message">Document saved</string>

@@ -140,11 +140,13 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
                 }
             }
         } else {
-            Text(
-                text = stringResource(id = R.string.scanner_screen_empty_text),
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
-            )
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = stringResource(id = R.string.scanner_screen_empty_text),
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
     }
 
@@ -214,8 +216,8 @@ private fun DocBox(doc: Doc, context: Context, viewModel: ScannerViewModel) {
     if (showBottomSheet) {
         val bottomSheetAction = listOf(
             Triple(
-                R.drawable.ic_open,
-                R.string.scanner_screen_more_action_bottom_sheet_open
+                R.drawable.ic_edit,
+                R.string.scanner_screen_more_action_bottom_sheet_edit
             ) {
                 context.openUri(doc.uri)
             },

@@ -26,6 +26,7 @@ class ScannerViewModel: ViewModel() {
 
     fun fetchDocs() {
         viewModelScope.launch(Dispatchers.IO) {
+            val result = arrayListOf<Doc>()
             val docUris = Storage.readDocs()
 
             docUris.forEach { uri ->
@@ -34,12 +35,14 @@ class ScannerViewModel: ViewModel() {
                 context?.let {
                     val fileName = context.getFileName(uri) ?: ""
                     val imageBitmap = uri.toImageBitmap(context)
-                    _docs.add(Doc(fileName, imageBitmap, uri))
+                    result.add(Doc(fileName, imageBitmap, uri))
                 }
             }
 
+            _docs.addAll(result)
+
             _filteredDocs.update {
-                _docs
+                result
             }
         }
     }
