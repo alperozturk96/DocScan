@@ -5,6 +5,11 @@
 
     <string name="scanner_screen_search_bar_placeholder">Filename…</string>
 
+    <string name="scanner_screen_filter_a_to_z">A - Z</string>
+    <string name="scanner_screen_filter_z_to_a">Z - A</string>
+    <string name="scanner_screen_filter_new_to_old">New To Old</string>
+    <string name="scanner_screen_filter_old_to_new">Old To New</string>
+
     <string name="scanner_screen_empty_search">No document found for %s</string>
     <string name="scanner_screen_empty_text">No document scanned</string>
     <string name="scanner_screen_scan_button_text">Tap to Scan</string>

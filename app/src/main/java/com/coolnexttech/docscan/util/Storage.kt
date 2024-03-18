@@ -9,7 +9,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import com.coolnexttech.docscan.R
 import com.coolnexttech.docscan.appContext
-import com.coolnexttech.docscan.ui.scanner.Doc
+import com.coolnexttech.docscan.ui.scanner.model.Doc
 import com.coolnexttech.docscan.util.extensions.showToast
 import com.coolnexttech.docscan.util.extensions.toBitmap
 import com.coolnexttech.docscan.util.extensions.toImageBitmap

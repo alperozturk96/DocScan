@@ -1,4 +1,4 @@
-package com.coolnexttech.docscan.ui.scanner
+package com.coolnexttech.docscan.ui.scanner.model
 
 import android.net.Uri
 import androidx.compose.ui.graphics.ImageBitmap

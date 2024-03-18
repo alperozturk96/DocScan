@@ -2,7 +2,10 @@ package com.coolnexttech.docscan.ui.scanner
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.coolnexttech.docscan.ui.scanner.model.Doc
+import com.coolnexttech.docscan.ui.scanner.model.SortOptions
 import com.coolnexttech.docscan.util.Storage
+import com.coolnexttech.docscan.util.extensions.sort
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,8 +34,22 @@ class ScannerViewModel: ViewModel() {
         }
     }
 
+    fun sort(sortOption: SortOptions) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = withContext(Dispatchers.IO) {
+                _filteredDocs.value?.sort(sortOption)
+            }
+
+            if (result?.isNotEmpty() == true) {
+                _filteredDocs.update {
+                    result
+                }
+            }
+        }
+    }
+
     fun search(text: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val result = withContext(Dispatchers.IO) {
                 if (text.isEmpty()) {
                     _docs

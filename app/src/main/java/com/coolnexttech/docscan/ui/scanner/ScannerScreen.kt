@@ -13,11 +13,14 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -25,6 +28,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +39,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +58,8 @@ import androidx.compose.ui.unit.dp
 import com.coolnexttech.docscan.R
 import com.coolnexttech.docscan.ui.component.MoreActionsBottomSheet
 import com.coolnexttech.docscan.ui.component.SimpleAlertDialog
+import com.coolnexttech.docscan.ui.scanner.model.Doc
+import com.coolnexttech.docscan.ui.scanner.model.SortOptions
 import com.coolnexttech.docscan.util.Storage
 import com.coolnexttech.docscan.util.extensions.openUri
 import com.coolnexttech.docscan.util.extensions.renameUri
@@ -92,6 +101,9 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
         .fillMaxSize(),
         topBar = {
             SearchBar(
+                sortDropDownMenu = {
+                    SortDropDownMenu(viewModel)
+                },
                 text = searchText,
                 onValueChange = {
                     searchText = it
@@ -244,36 +256,94 @@ private fun DocBox(doc: Doc, context: Context, viewModel: ScannerViewModel) {
 }
 
 @Composable
+private fun SortDropDownMenu(viewModel: ScannerViewModel) {
+    var expanded by remember { mutableStateOf(false) }
+    var sortOption by remember { mutableStateOf(SortOptions.NewToOld) }
+
+    LaunchedEffect(sortOption) {
+        expanded = false
+        viewModel.sort(sortOption)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentSize(Alignment.TopEnd)
+    ) {
+        IconButton(onClick = { expanded = !expanded }) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = "More"
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(id = R.string.scanner_screen_filter_a_to_z)) },
+                onClick = {
+                    sortOption = SortOptions.AToZ
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(id = R.string.scanner_screen_filter_z_to_a)) },
+                onClick = {
+                    sortOption = SortOptions.ZToA
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(id = R.string.scanner_screen_filter_new_to_old)) },
+                onClick = {
+                    sortOption = SortOptions.NewToOld
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(id = R.string.scanner_screen_filter_old_to_new)) },
+                onClick = {
+                    sortOption = SortOptions.OldToNew
+                }
+            )
+        }
+    }
+}
+
+@Composable
 private fun SearchBar(
+    sortDropDownMenu: @Composable RowScope.() -> Unit,
     text: String,
     onValueChange: (String) -> Unit,
     clear: () -> Unit
 ) {
-    TextField(
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-        value = text,
-        placeholder = {
-            Text(text = stringResource(id = R.string.scanner_screen_search_bar_placeholder))
-        },
-        onValueChange = {
-            onValueChange(it)
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        trailingIcon = {
-            if (text.isNotEmpty()) {
-                IconButton(
-                    onClick = {
-                        clear()
-                    }) {
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = "Clear",
-                    )
+    Row(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+        TextField(
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            value = text,
+            placeholder = {
+                Text(text = stringResource(id = R.string.scanner_screen_search_bar_placeholder))
+            },
+            onValueChange = {
+                onValueChange(it)
+            },
+            modifier = Modifier
+                .fillMaxWidth(0.85f),
+            trailingIcon = {
+                if (text.isNotEmpty()) {
+                    IconButton(
+                        onClick = {
+                            clear()
+                        }) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Clear",
+                        )
+                    }
                 }
             }
-        }
-    )
+        )
+
+        sortDropDownMenu()
+    }
 }
