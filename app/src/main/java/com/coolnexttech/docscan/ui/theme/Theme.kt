@@ -25,7 +25,7 @@ fun DocScanTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.background.toArgb()
+            window.statusBarColor = Color.Black.copy(0.5f).toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars
         }
     }

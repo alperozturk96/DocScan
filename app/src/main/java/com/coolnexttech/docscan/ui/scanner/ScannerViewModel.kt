@@ -24,13 +24,15 @@ class ScannerViewModel: ViewModel() {
         fetchDocs()
     }
 
-    fun fetchDocs() {
+    fun fetchDocs(onCompleted: () -> Unit = {}) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = Storage.readDocs()
             _docs.addAll(result)
             _filteredDocs.update {
                 result
             }
+
+            onCompleted()
         }
     }
 

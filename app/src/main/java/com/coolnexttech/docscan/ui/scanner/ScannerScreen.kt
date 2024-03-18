@@ -31,13 +31,16 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -49,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -65,7 +69,7 @@ import com.coolnexttech.docscan.util.extensions.openUri
 import com.coolnexttech.docscan.util.extensions.renameUri
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
     val context = LocalContext.current
@@ -75,6 +79,15 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
     }
     var startScan by remember {
         mutableStateOf(false)
+    }
+    val pullRefreshState = rememberPullToRefreshState()
+
+    if (pullRefreshState.isRefreshing) {
+        LaunchedEffect(true) {
+            viewModel.fetchDocs(onCompleted = {
+                pullRefreshState.endRefresh()
+            })
+        }
     }
 
     val scannerLauncher = rememberLauncherForActivityResult(
@@ -97,73 +110,84 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
         }
     )
 
-    Scaffold(modifier = Modifier
-        .fillMaxSize(),
-        topBar = {
-            SearchBar(
-                sortDropDownMenu = {
-                    SortDropDownMenu(viewModel)
-                },
-                text = searchText,
-                onValueChange = {
-                    searchText = it
-                    viewModel.search(it)
-                }, clear = {
-                    searchText = ""
-                    viewModel.search(searchText)
-                }
-            )
-        },
-        bottomBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-                    .background(
-                        color = Color.Black.copy(alpha = 0.5f),
-                    )
-            ) {
-                FilledTonalButton(
-                    onClick = {
-                        startScan = true
-                    }, modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .height(50.dp)
-                        .align(Alignment.Center)
-                ) {
-                    Text(
-                        text = stringResource(id = (R.string.scanner_screen_scan_button_text)),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = Color.White
-                    )
-                }
-            }
-
-        }) { padding ->
-        if (!filteredDocs.isNullOrEmpty()) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                modifier = Modifier.padding(16.dp),
-                contentPadding = padding,
-            ) {
-                items(filteredDocs!!) { doc ->
-                    DocBox(doc, context, viewModel)
-                }
-            }
-        } else {
-            val text = if (searchText.isEmpty()) {
-                stringResource(id = R.string.scanner_screen_empty_text)
-            } else {
-                stringResource(id = R.string.scanner_screen_empty_search, searchText)
-            }
-
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center,
+    Box(Modifier.nestedScroll(pullRefreshState.nestedScrollConnection))  {
+        Scaffold(modifier = Modifier
+            .fillMaxSize(),
+            topBar = {
+                SearchBar(
+                    sortDropDownMenu = {
+                        SortDropDownMenu(viewModel)
+                    },
+                    text = searchText,
+                    onValueChange = {
+                        searchText = it
+                        viewModel.search(it)
+                    }, clear = {
+                        searchText = ""
+                        viewModel.search(searchText)
+                    }
                 )
+            },
+            bottomBar = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(70.dp)
+                        .background(
+                            color = Color.Black.copy(alpha = 0.5f),
+                        )
+                ) {
+                    FilledTonalButton(
+                        onClick = {
+                            startScan = true
+                        }, modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(50.dp)
+                            .align(Alignment.Center)
+                    ) {
+                        Text(
+                            text = stringResource(id = (R.string.scanner_screen_scan_button_text)),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = Color.White
+                        )
+                    }
+                }
+
+            }) { padding ->
+            if (!filteredDocs.isNullOrEmpty()) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier.padding(16.dp),
+                    contentPadding = padding,
+                ) {
+                    items(filteredDocs!!) { doc ->
+                        DocBox(doc, context, viewModel)
+                    }
+                }
+            } else {
+                val text = if (searchText.isEmpty()) {
+                    stringResource(id = R.string.scanner_screen_empty_text)
+                } else {
+                    stringResource(id = R.string.scanner_screen_empty_search, searchText)
+                }
+
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.titleLarge,
+                        textAlign = TextAlign.Center,
+                    )
+                }
             }
+        }
+
+        if (pullRefreshState.isRefreshing) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        } else {
+            LinearProgressIndicator(
+                progress = { pullRefreshState.progress },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 
@@ -316,7 +340,9 @@ private fun SearchBar(
     onValueChange: (String) -> Unit,
     clear: () -> Unit
 ) {
-    Row(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp)) {
         TextField(
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
