@@ -24,9 +24,7 @@ class ScannerViewModel: ViewModel() {
     fun fetchDocs() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = Storage.readDocs()
-
             _docs.addAll(result)
-
             _filteredDocs.update {
                 result
             }

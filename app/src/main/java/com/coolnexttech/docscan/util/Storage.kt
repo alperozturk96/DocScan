@@ -61,13 +61,14 @@ object Storage {
         )
         val selection = "${MediaStore.Images.Media.RELATIVE_PATH} LIKE ?"
         val selectionArgs = arrayOf("%/$DIRECTORY/%")
+        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
 
         contentResolver.query(
             uriExternal,
             projection,
             selection,
             selectionArgs,
-            "${MediaStore.Images.Media.DATE_ADDED} DESC"
+            sortOrder
         )?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             val filenameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
