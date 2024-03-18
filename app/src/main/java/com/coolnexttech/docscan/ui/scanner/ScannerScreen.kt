@@ -342,7 +342,9 @@ private fun SearchBar(
 ) {
     Row(modifier = Modifier
         .fillMaxWidth()
-        .padding(16.dp)) {
+        .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically) {
+
         TextField(
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
