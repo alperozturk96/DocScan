@@ -3,6 +3,9 @@
     <string name="common_ok">OK</string>
     <string name="common_cancel">Cancel</string>
 
+    <string name="scanner_screen_search_bar_placeholder">Filename…</string>
+
+    <string name="scanner_screen_empty_search">No document found for %s</string>
     <string name="scanner_screen_empty_text">No document scanned</string>
     <string name="scanner_screen_scan_button_text">Tap to Scan</string>
 

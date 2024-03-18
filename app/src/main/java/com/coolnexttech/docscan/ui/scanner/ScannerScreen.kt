@@ -139,9 +139,15 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
                 }
             }
         } else {
+            val text = if (searchText.isEmpty()) {
+                stringResource(id = R.string.scanner_screen_empty_text)
+            } else {
+                stringResource(id = R.string.scanner_screen_empty_search, searchText)
+            }
+
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
-                    text = stringResource(id = R.string.scanner_screen_empty_text),
+                    text = text,
                     style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center,
                 )
@@ -247,6 +253,9 @@ private fun SearchBar(
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         value = text,
+        placeholder = {
+            Text(text = stringResource(id = R.string.scanner_screen_search_bar_placeholder))
+        },
         onValueChange = {
             onValueChange(it)
         },
