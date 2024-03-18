@@ -5,6 +5,8 @@
 
     <string name="scanner_screen_search_bar_placeholder">Filename…</string>
 
+    <string name="scanner_screen_documents_fetched">Documents are updated</string>
+
     <string name="scanner_screen_filter_a_to_z">A - Z</string>
     <string name="scanner_screen_filter_z_to_a">Z - A</string>
     <string name="scanner_screen_filter_new_to_old">New To Old</string>

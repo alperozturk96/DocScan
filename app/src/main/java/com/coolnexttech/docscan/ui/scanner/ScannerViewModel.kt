@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 
 class ScannerViewModel: ViewModel() {
 
-    private val _docs: ArrayList<Doc> = arrayListOf()
+    private var _docs: List<Doc> = listOf()
 
     private val _filteredDocs: MutableStateFlow<List<Doc>?> = MutableStateFlow(null)
     val filteredDocs: StateFlow<List<Doc>?> = _filteredDocs
@@ -27,12 +27,14 @@ class ScannerViewModel: ViewModel() {
     fun fetchDocs(onCompleted: () -> Unit = {}) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = Storage.readDocs()
-            _docs.addAll(result)
+            _docs = result
             _filteredDocs.update {
                 result
             }
 
-            onCompleted()
+            launch(Dispatchers.Main) {
+                onCompleted()
+            }
         }
     }
 

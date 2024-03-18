@@ -67,6 +67,7 @@ import com.coolnexttech.docscan.ui.scanner.model.SortOptions
 import com.coolnexttech.docscan.util.Storage
 import com.coolnexttech.docscan.util.extensions.openUri
 import com.coolnexttech.docscan.util.extensions.renameUri
+import com.coolnexttech.docscan.util.extensions.showToast
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,6 +87,7 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
         LaunchedEffect(true) {
             viewModel.fetchDocs(onCompleted = {
                 pullRefreshState.endRefresh()
+                context.showToast(R.string.scanner_screen_documents_fetched)
             })
         }
     }
