@@ -16,14 +16,16 @@ import com.coolnexttech.docscan.util.PermissionManager
 class MainActivity : ComponentActivity() {
 
     private lateinit var permissionManager: PermissionManager
+    private val viewModel = ScannerViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        permissionManager = PermissionManager(this)
+        permissionManager = PermissionManager(this, onComplete = {
+            viewModel.fetchDocs()
+        })
 
         setContent {
-
             LaunchedEffect(Unit) {
                 permissionManager.requestForStoragePermissions()
             }
@@ -33,7 +35,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    ScannerScreen(activity = this, viewModel = ScannerViewModel())
+                    ScannerScreen(activity = this, viewModel = viewModel)
                 }
             }
         }
