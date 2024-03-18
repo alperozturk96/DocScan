@@ -2,10 +2,7 @@ package com.coolnexttech.docscan.ui.scanner
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.coolnexttech.docscan.appContext
 import com.coolnexttech.docscan.util.Storage
-import com.coolnexttech.docscan.util.extensions.getFileName
-import com.coolnexttech.docscan.util.extensions.toImageBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,18 +23,7 @@ class ScannerViewModel: ViewModel() {
 
     fun fetchDocs() {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = arrayListOf<Doc>()
-            val docUris = Storage.readDocs()
-
-            docUris.forEach { uri ->
-                val context = appContext.get()
-
-                context?.let {
-                    val fileName = context.getFileName(uri) ?: ""
-                    val imageBitmap = uri.toImageBitmap(context)
-                    result.add(Doc(fileName, imageBitmap, uri))
-                }
-            }
+            val result = Storage.readDocs()
 
             _docs.addAll(result)
 

@@ -72,6 +72,7 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
         contract = ActivityResultContracts.StartIntentSenderForResult(),
         onResult = {
             startScan = false
+
             if (it.resultCode == Activity.RESULT_OK) {
                 val result = GmsDocumentScanningResult.fromActivityResultIntent(it.data)
 
@@ -90,18 +91,16 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
     Scaffold(modifier = Modifier
         .fillMaxSize(),
         topBar = {
-            if (!filteredDocs.isNullOrEmpty()) {
-                SearchBar(
-                    text = searchText,
-                    onValueChange = {
-                        searchText = it
-                        viewModel.search(it)
-                    }, clear = {
-                        searchText = ""
-                        viewModel.search(searchText)
-                    }
-                )
-            }
+            SearchBar(
+                text = searchText,
+                onValueChange = {
+                    searchText = it
+                    viewModel.search(it)
+                }, clear = {
+                    searchText = ""
+                    viewModel.search(searchText)
+                }
+            )
         },
         bottomBar = {
             Box(
@@ -152,8 +151,6 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
 
     if (startScan) {
         Scan(activity, start = {
-
-            // TODO always launching even with scroll
             // TODO after edit not showing edited docs
             scannerLauncher.launch(IntentSenderRequest.Builder(it).build())
         })
