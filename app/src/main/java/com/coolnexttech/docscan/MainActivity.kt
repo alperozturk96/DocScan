@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         permissionManager = PermissionManager(this, onComplete = {
-            viewModel.fetchDocs()
+            viewModel.readDocs()
         })
 
         setContent {

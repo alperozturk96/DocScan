@@ -85,7 +85,7 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
 
     if (pullRefreshState.isRefreshing) {
         LaunchedEffect(true) {
-            viewModel.fetchDocs(onCompleted = {
+            viewModel.readDocs(onCompleted = {
                 pullRefreshState.endRefresh()
                 context.showToast(R.string.scanner_screen_documents_fetched)
             })
@@ -105,14 +105,14 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
                         val imageUri = page.imageUri
 
                         Storage.saveDoc(context, imageUri)
-                        viewModel.fetchDocs()
+                        viewModel.readDocs()
                     }
                 }
             }
         }
     )
 
-    Box(Modifier.nestedScroll(pullRefreshState.nestedScrollConnection))  {
+    Box(Modifier.nestedScroll(pullRefreshState.nestedScrollConnection)) {
         Scaffold(modifier = Modifier
             .fillMaxSize(),
             topBar = {
@@ -194,10 +194,12 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
     }
 
     if (startScan) {
-        Scan(activity, start = {
-            // TODO after edit not showing edited docs
-            scannerLauncher.launch(IntentSenderRequest.Builder(it).build())
-        })
+        Scan(
+            activity = activity,
+            start = {
+                scannerLauncher.launch(IntentSenderRequest.Builder(it).build())
+            }
+        )
     }
 }
 
@@ -249,7 +251,7 @@ private fun DocBox(doc: Doc, context: Context, viewModel: ScannerViewModel) {
             },
             onComplete = {
                 context.renameUri(doc.uri, docName)
-                viewModel.fetchDocs()
+                viewModel.readDocs()
             },
             dismiss = {
                 showRenameAlertDialog = false
@@ -342,10 +344,12 @@ private fun SearchBar(
     onValueChange: (String) -> Unit,
     clear: () -> Unit
 ) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
 
         TextField(
             singleLine = true,
