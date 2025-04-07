@@ -20,15 +20,8 @@ class ScannerViewModel: ViewModel() {
     private val _filteredDocs: MutableStateFlow<List<Doc>?> = MutableStateFlow(null)
     val filteredDocs: StateFlow<List<Doc>?> = _filteredDocs
 
-    private val _loading: MutableStateFlow<Boolean?> = MutableStateFlow(null)
-    val loading: StateFlow<Boolean?> = _loading
-
     fun readDocs(onCompleted: () -> Unit = {}) {
         viewModelScope.launch(Dispatchers.IO) {
-            _loading.update {
-                true
-            }
-
             val result = Storage.readDocs()
             _docs = result
             _filteredDocs.update {
@@ -37,16 +30,7 @@ class ScannerViewModel: ViewModel() {
 
             launch(Dispatchers.Main) {
                 onCompleted()
-                _loading.update {
-                    false
-                }
             }
-        }
-    }
-
-    fun hideLoading() {
-        _loading.update {
-            false
         }
     }
 

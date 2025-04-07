@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -26,7 +27,8 @@ fun SearchBar(
     sortDropDownMenu: @Composable RowScope.() -> Unit,
     text: String,
     onValueChange: (String) -> Unit,
-    clear: () -> Unit
+    clear: () -> Unit,
+    refresh: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -49,7 +51,7 @@ fun SearchBar(
                 onValueChange(it)
             },
             modifier = Modifier
-                .fillMaxWidth(0.85f),
+                .fillMaxWidth(0.8f),
             trailingIcon = {
                 if (text.isNotEmpty()) {
                     IconButton(
@@ -64,6 +66,13 @@ fun SearchBar(
                 }
             }
         )
+
+        IconButton(onClick = { refresh() }) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = "Refresh"
+            )
+        }
 
         sortDropDownMenu()
     }

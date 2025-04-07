@@ -1,19 +1,19 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0" apply true
+    alias(libs.plugins.kotlinCompose) apply true
 }
 
 android {
     namespace = "com.coolnexttech.docscan"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.coolnexttech.docscan"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
-        versionName = "0.1"
+        versionName = "0.2"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -32,16 +32,16 @@ android {
         }
 
         debug {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "21"
     }
     buildFeatures {
         compose = true
