@@ -51,9 +51,8 @@ import androidx.compose.ui.unit.dp
 import com.coolnexttech.docscan.R
 import com.coolnexttech.docscan.ui.component.MoreActionsBottomSheet
 import com.coolnexttech.docscan.ui.component.SimpleAlertDialog
-import com.coolnexttech.docscan.ui.component.UnderlayBox
-import com.coolnexttech.docscan.ui.scanner.component.TopBarTextField
 import com.coolnexttech.docscan.ui.scanner.component.SortDropDownMenu
+import com.coolnexttech.docscan.ui.scanner.component.TopBarTextField
 import com.coolnexttech.docscan.ui.scanner.model.Doc
 import com.coolnexttech.docscan.util.Storage
 import com.coolnexttech.docscan.util.extensions.openUri
@@ -118,11 +117,14 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
                     )
                 }
             )
-
         },
         bottomBar = {
             BottomAppBar {
-                UnderlayBox {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(70.dp)
+                ) {
                     FilledTonalButton(
                         onClick = {
                             startScan = true

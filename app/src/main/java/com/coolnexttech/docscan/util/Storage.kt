@@ -7,6 +7,8 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Size
+import androidx.compose.ui.graphics.asImageBitmap
 import com.coolnexttech.docscan.R
 import com.coolnexttech.docscan.appContext
 import com.coolnexttech.docscan.ui.scanner.model.Doc
@@ -14,7 +16,6 @@ import com.coolnexttech.docscan.util.extensions.showToast
 import com.coolnexttech.docscan.util.extensions.toBitmap
 import com.coolnexttech.docscan.util.extensions.toImageBitmap
 import java.io.OutputStream
-
 
 object Storage {
     private const val DIRECTORY = "DocScan"
@@ -41,7 +42,7 @@ object Storage {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             outputStream.flush()
             context.showToast(R.string.storage_save_image_to_gallery_success_message)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             context.showToast(R.string.storage_save_image_to_gallery_error_message)
         } finally {
             outputStream.close()
@@ -57,7 +58,9 @@ object Storage {
         val projection = arrayOf(
             MediaStore.Images.Media._ID,
             MediaStore.Images.Media.DISPLAY_NAME,
-            MediaStore.Images.Media.DATE_MODIFIED
+            MediaStore.Images.Media.DATE_MODIFIED,
+            MediaStore.Images.Media.WIDTH,
+            MediaStore.Images.Media.HEIGHT
         )
         val selection = "${MediaStore.Images.Media.RELATIVE_PATH} LIKE ?"
         val selectionArgs = arrayOf("%/$DIRECTORY/%")
@@ -74,15 +77,29 @@ object Storage {
             val filenameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
             val dateModifiedColumn =
                 cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
+            val widthColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.WIDTH)
+            val heightColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.HEIGHT)
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
                 val filename = cursor.getString(filenameColumn)
                 val dateModified = cursor.getLong(dateModifiedColumn)
                 val uri = ContentUris.withAppendedId(uriExternal, id)
+                val width = cursor.getInt(widthColumn)
+                val height = cursor.getInt(heightColumn)
 
-                val imageBitmap = uri.toImageBitmap(context)
-                result.add(Doc(id, filename, imageBitmap, uri, dateModified))
+                val thumbnailSize = if (width > 0 && height > 0) {
+                    Size(width, height)
+                } else {
+                    Size(300, 300)
+                }
+
+                val thumbnail = try {
+                    context.contentResolver.loadThumbnail(uri, thumbnailSize, null).asImageBitmap()
+                } catch (_: Exception) {
+                    uri.toImageBitmap(context)
+                }
+                result.add(Doc(id, filename, thumbnail, uri, dateModified))
             }
         }
 
