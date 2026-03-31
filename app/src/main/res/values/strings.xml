@@ -9,12 +9,12 @@
 
     <string name="scanner_screen_filter_a_to_z">A - Z</string>
     <string name="scanner_screen_filter_z_to_a">Z - A</string>
-    <string name="scanner_screen_filter_new_to_old">New To Old</string>
-    <string name="scanner_screen_filter_old_to_new">Old To New</string>
+    <string name="scanner_screen_filter_new_to_old">New To old</string>
+    <string name="scanner_screen_filter_old_to_new">Old To new</string>
 
     <string name="scanner_screen_empty_search">No document found for %s</string>
     <string name="scanner_screen_empty_text">No document scanned</string>
-    <string name="scanner_screen_scan_button_text">Tap to Scan</string>
+    <string name="scanner_screen_scan_button_text">Tap to scan</string>
 
     <string name="scanner_screen_rename_alert_dialog_title">Rename</string>
 

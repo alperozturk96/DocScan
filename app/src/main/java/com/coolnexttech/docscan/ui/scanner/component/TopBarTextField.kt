@@ -52,10 +52,7 @@ fun TopBarTextField(
             ),
             trailingIcon = {
                 if (text.isNotEmpty()) {
-                    IconButton(
-                        onClick = {
-                            clear()
-                        }) {
+                    IconButton(onClick = clear) {
                         Icon(
                             imageVector = Icons.Default.Clear,
                             contentDescription = "Clear",
@@ -65,7 +62,7 @@ fun TopBarTextField(
             }
         )
 
-        IconButton(onClick = { refresh() }) {
+        IconButton(onClick = refresh) {
             Icon(
                 imageVector = Icons.Default.Refresh,
                 contentDescription = "Refresh"
