@@ -48,6 +48,11 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    tasks.withType<JavaCompile>().configureEach {
+        options.isFork = true
+        options.isIncremental = true
+    }
 }
 
 dependencies {

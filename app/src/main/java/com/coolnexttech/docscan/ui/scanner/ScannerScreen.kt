@@ -54,6 +54,7 @@ import com.coolnexttech.docscan.ui.component.SimpleAlertDialog
 import com.coolnexttech.docscan.ui.scanner.component.SortDropDownMenu
 import com.coolnexttech.docscan.ui.scanner.component.TopBarTextField
 import com.coolnexttech.docscan.ui.scanner.model.Doc
+import com.coolnexttech.docscan.ui.scanner.model.ScannerOverlayState
 import com.coolnexttech.docscan.util.Storage
 import com.coolnexttech.docscan.util.extensions.openUri
 import com.coolnexttech.docscan.util.extensions.renameUri
@@ -182,8 +183,7 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun DocBox(doc: Doc, context: Context, viewModel: ScannerViewModel) {
-    var showBottomSheet by remember { mutableStateOf(false) }
-    var showRenameAlertDialog by remember { mutableStateOf(false) }
+    var overlayState by remember { mutableStateOf(ScannerOverlayState.Idle) }
     var docName by remember { mutableStateOf("") }
 
     Column(
@@ -192,7 +192,7 @@ private fun DocBox(doc: Doc, context: Context, viewModel: ScannerViewModel) {
             .border(0.dp, Color.Transparent, RoundedCornerShape(16.dp))
             .combinedClickable(
                 onClick = { context.openUri(doc.uri) },
-                onLongClick = { showBottomSheet = true }
+                onLongClick = { overlayState = ScannerOverlayState.BottomSheet }
             )
     ) {
         Image(
@@ -211,50 +211,52 @@ private fun DocBox(doc: Doc, context: Context, viewModel: ScannerViewModel) {
         )
     }
 
-    if (showRenameAlertDialog) {
-        SimpleAlertDialog(
-            titleId = R.string.scanner_screen_rename_alert_dialog_title,
-            description = null,
-            content = {
-                TextField(
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    value = docName,
-                    onValueChange = {
-                        docName = it
-                    },
-                    singleLine = true
-                )
-            },
-            onComplete = {
-                context.renameUri(doc.uri, docName)
-                viewModel.readDocs()
-            },
-            dismiss = {
-                showRenameAlertDialog = false
-            }
-        )
-    }
+    when(overlayState) {
+        ScannerOverlayState.BottomSheet -> {
+            val bottomSheetAction = listOf(
+                Triple(
+                    R.drawable.ic_edit,
+                    R.string.scanner_screen_more_action_bottom_sheet_edit
+                ) {
+                    context.openUri(doc.uri)
+                },
+                Triple(
+                    R.drawable.ic_rename,
+                    R.string.scanner_screen_more_action_bottom_sheet_rename
+                ) {
+                    overlayState = ScannerOverlayState.RenameDialog
+                }
+            )
 
-    if (showBottomSheet) {
-        val bottomSheetAction = listOf(
-            Triple(
-                R.drawable.ic_edit,
-                R.string.scanner_screen_more_action_bottom_sheet_edit
-            ) {
-                context.openUri(doc.uri)
-            },
-            Triple(
-                R.drawable.ic_rename,
-                R.string.scanner_screen_more_action_bottom_sheet_rename
-            ) {
-                showRenameAlertDialog = true
-            }
-        )
-
-        MoreActionsBottomSheet(
-            title = doc.filename,
-            actions = bottomSheetAction,
-            dismiss = { showBottomSheet = false }
-        )
+            MoreActionsBottomSheet(
+                title = doc.filename,
+                actions = bottomSheetAction,
+                dismiss = { overlayState = ScannerOverlayState.Idle }
+            )
+        }
+        ScannerOverlayState.RenameDialog -> {
+            SimpleAlertDialog(
+                titleId = R.string.scanner_screen_rename_alert_dialog_title,
+                description = null,
+                content = {
+                    TextField(
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        value = docName,
+                        onValueChange = {
+                            docName = it
+                        },
+                        singleLine = true
+                    )
+                },
+                onComplete = {
+                    context.renameUri(doc.uri, docName)
+                    viewModel.readDocs()
+                },
+                dismiss = {
+                    overlayState = ScannerOverlayState.Idle
+                }
+            )
+        }
+        ScannerOverlayState.Idle -> Unit
     }
 }
