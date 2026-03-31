@@ -12,6 +12,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +23,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -83,7 +85,9 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
         }
     )
 
-    Scaffold(modifier = Modifier
+    Scaffold(
+        contentWindowInsets = WindowInsets(0),
+        modifier = Modifier
         .fillMaxSize()
         .padding(top = 24.dp),
         topBar = {
@@ -107,20 +111,22 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
             )
         },
         bottomBar = {
-            UnderlayBox {
-                FilledTonalButton(
-                    onClick = {
-                        startScan = true
-                    }, modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .height(50.dp)
-                        .align(Alignment.Center)
-                ) {
-                    Text(
-                        text = stringResource(id = (R.string.scanner_screen_scan_button_text)),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = Color.White
-                    )
+            BottomAppBar {
+                UnderlayBox {
+                    FilledTonalButton(
+                        onClick = {
+                            startScan = true
+                        }, modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(50.dp)
+                            .align(Alignment.Center)
+                    ) {
+                        Text(
+                            text = stringResource(id = (R.string.scanner_screen_scan_button_text)),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = Color.White
+                        )
+                    }
                 }
             }
         }) { padding ->

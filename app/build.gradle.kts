@@ -1,19 +1,18 @@
 plugins {
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.kotlinCompose) apply true
 }
 
 android {
     namespace = "com.coolnexttech.docscan"
-    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.coolnexttech.docscan"
         minSdk = 29
-        targetSdk = 35
-        versionCode = 2
-        versionName = "0.2"
+        compileSdk = 36
+        targetSdk = 36
+        versionCode = 3
+        versionName = "0.3"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -40,9 +39,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
-    }
+
     buildFeatures {
         compose = true
     }
@@ -62,6 +59,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material.icons.core)
 
     implementation(libs.play.services.mlkit.document.scanner)
 }
