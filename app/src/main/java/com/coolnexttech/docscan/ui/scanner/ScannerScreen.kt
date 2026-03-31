@@ -24,11 +24,14 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopSearchBar
+import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -49,7 +52,7 @@ import com.coolnexttech.docscan.R
 import com.coolnexttech.docscan.ui.component.MoreActionsBottomSheet
 import com.coolnexttech.docscan.ui.component.SimpleAlertDialog
 import com.coolnexttech.docscan.ui.component.UnderlayBox
-import com.coolnexttech.docscan.ui.scanner.component.SearchBar
+import com.coolnexttech.docscan.ui.scanner.component.TopBarTextField
 import com.coolnexttech.docscan.ui.scanner.component.SortDropDownMenu
 import com.coolnexttech.docscan.ui.scanner.model.Doc
 import com.coolnexttech.docscan.util.Storage
@@ -58,12 +61,14 @@ import com.coolnexttech.docscan.util.extensions.renameUri
 import com.coolnexttech.docscan.util.extensions.showToast
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
     val context = LocalContext.current
     val filteredDocs by viewModel.filteredDocs.collectAsState()
     var searchText by remember { mutableStateOf("") }
     var startScan by remember { mutableStateOf(false) }
+    val searchBarState = rememberSearchBarState()
 
     val scannerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
@@ -88,27 +93,32 @@ fun ScannerScreen(activity: ComponentActivity, viewModel: ScannerViewModel) {
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         modifier = Modifier
-        .fillMaxSize()
-        .padding(top = 24.dp),
+        .fillMaxSize(),
         topBar = {
-            SearchBar(
-                sortDropDownMenu = {
-                    SortDropDownMenu(viewModel)
-                },
-                text = searchText,
-                onValueChange = {
-                    searchText = it
-                    viewModel.search(it)
-                }, clear = {
-                    searchText = ""
-                    viewModel.search(searchText)
-                },
-                refresh = {
-                    viewModel.readDocs(onCompleted = {
-                        context.showToast(R.string.scanner_screen_documents_fetched)
-                    })
+            TopSearchBar(
+                state = searchBarState,
+                inputField = {
+                    TopBarTextField(
+                        sortDropDownMenu = {
+                            SortDropDownMenu(viewModel)
+                        },
+                        text = searchText,
+                        onValueChange = {
+                            searchText = it
+                            viewModel.search(it)
+                        }, clear = {
+                            searchText = ""
+                            viewModel.search(searchText)
+                        },
+                        refresh = {
+                            viewModel.readDocs(onCompleted = {
+                                context.showToast(R.string.scanner_screen_documents_fetched)
+                            })
+                        }
+                    )
                 }
             )
+
         },
         bottomBar = {
             BottomAppBar {
